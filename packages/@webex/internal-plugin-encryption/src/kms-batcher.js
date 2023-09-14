@@ -5,7 +5,7 @@
 import {safeSetTimeout} from '@webex/common-timers';
 import {Batcher} from '@webex/webex-core';
 
-import {KmsError, KmsTimeoutError} from './kms-errors';
+import {KmsError, KmsTimeoutError, handleKmsKeyRevokedEncryptionFailure} from './kms-errors';
 
 export const TIMEOUT_SYMBOL = Symbol('TIMEOUT_SYMBOL');
 
@@ -134,6 +134,7 @@ const KmsBatcher = Batcher.extend({
    */
   handleItemFailure(item, reason) {
     return this.getDeferredForResponse(item).then((defer) => {
+      handleKmsKeyRevokedEncryptionFailure(item, this.webex);
       defer.reject(reason || new KmsError(item.body));
     });
   },
